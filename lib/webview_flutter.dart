@@ -131,6 +131,8 @@ class JavascriptChannel {
 
 /// A web view widget for showing html content.
 class WebView extends StatefulWidget {
+  final bool ignoreSSLComplains;
+  final bool enableGeoLocation;
   /// Creates a new web view.
   ///
   /// The web view can be controlled using a `WebViewController` that is passed to the
@@ -152,6 +154,8 @@ class WebView extends StatefulWidget {
     this.userAgent,
     this.initialMediaPlaybackPolicy =
         AutoMediaPlaybackPolicy.require_user_action_for_all_media_types,
+    this.ignoreSSLComplains=false,
+    this.enableGeoLocation=false
   })  : assert(javascriptMode != null),
         assert(initialMediaPlaybackPolicy != null),
         super(key: key);
@@ -383,6 +387,8 @@ CreationParams _creationParamsfromWidget(WebView widget) {
     javascriptChannelNames: _extractChannelNames(widget.javascriptChannels),
     userAgent: widget.userAgent,
     autoMediaPlaybackPolicy: widget.initialMediaPlaybackPolicy,
+    enableGeoLocation: widget.enableGeoLocation,
+    ignoreSSLComplains: widget.enableGeoLocation
   );
 }
 

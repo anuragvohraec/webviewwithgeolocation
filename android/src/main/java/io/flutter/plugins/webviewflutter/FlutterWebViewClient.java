@@ -27,6 +27,7 @@ class FlutterWebViewClient {
   private static final String TAG = "FlutterWebViewClient";
   private final MethodChannel methodChannel;
   private boolean hasNavigationDelegate;
+  private boolean ignoreSSLComplains;
 
   FlutterWebViewClient(MethodChannel methodChannel) {
     this.methodChannel = methodChannel;
@@ -97,8 +98,9 @@ class FlutterWebViewClient {
   // This method attempts to avoid using WebViewClientCompat due to bug
   // https://bugs.chromium.org/p/chromium/issues/detail?id=925887. Also, see
   // https://github.com/flutter/flutter/issues/29446.
-  WebViewClient createWebViewClient(boolean hasNavigationDelegate) {
+  WebViewClient createWebViewClient(boolean hasNavigationDelegate, boolean ignoreSSLComplains) {
     this.hasNavigationDelegate = hasNavigationDelegate;
+    this.ignoreSSLComplains=ignoreSSLComplains;
 
     if (!hasNavigationDelegate || android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
       return internalCreateWebViewClient();
@@ -117,7 +119,11 @@ class FlutterWebViewClient {
 
       @Override
       public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-        handler.proceed();
+        if(ignoreSSLComplains){
+          handler.proceed();
+        }else{
+          super.onReceivedSslError(view, handler, error);
+        }
       }
 
       @Override

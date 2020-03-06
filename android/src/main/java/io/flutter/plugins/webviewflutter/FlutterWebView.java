@@ -30,6 +30,7 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
   private final MethodChannel methodChannel;
   private final FlutterWebViewClient flutterWebViewClient;
   private final Handler platformThreadHandler;
+  private boolean ignoreSSLComplains;
 
   private WebChromeClient internalCreateWebChromeClient(){
     return new WebChromeClient(){
@@ -63,12 +64,14 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
     // Allow local storage.
     webView.getSettings().setDomStorageEnabled(true);
     webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
-    webView.getSettings().setGeolocationEnabled(true);
-    webView.setWebChromeClient(internalCreateWebChromeClient());
+    if((boolean) params.get("enableGeoLocation")){
+      webView.getSettings().setGeolocationEnabled(true);
+      webView.setWebChromeClient(internalCreateWebChromeClient());
+    }
 
     methodChannel = new MethodChannel(messenger, "plugins.flutter.io/webview_" + id);
     methodChannel.setMethodCallHandler(this);
-
+    ignoreSSLComplains=(boolean) params.get("ignoreSSLComplains");
     flutterWebViewClient = new FlutterWebViewClient(methodChannel);
     applySettings((Map<String, Object>) params.get("settings"));
 
@@ -280,7 +283,7 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
           final boolean hasNavigationDelegate = (boolean) settings.get(key);
 
           final WebViewClient webViewClient =
-              flutterWebViewClient.createWebViewClient(hasNavigationDelegate);
+              flutterWebViewClient.createWebViewClient(hasNavigationDelegate, ignoreSSLComplains);
 
           webView.setWebViewClient(webViewClient);
           break;

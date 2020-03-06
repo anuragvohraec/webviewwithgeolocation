@@ -271,6 +271,8 @@ class WebSettings {
 ///
 /// The `autoMediaPlaybackPolicy` parameter must not be null.
 class CreationParams {
+  final bool ignoreSSLComplains;
+  final bool enableGeoLocation;
   /// Constructs an instance to use when creating a new
   /// [WebViewPlatformController].
   ///
@@ -282,6 +284,8 @@ class CreationParams {
     this.userAgent,
     this.autoMediaPlaybackPolicy =
         AutoMediaPlaybackPolicy.require_user_action_for_all_media_types,
+    this.enableGeoLocation=false,
+    this.ignoreSSLComplains
   }) : assert(autoMediaPlaybackPolicy != null);
 
   /// The initialUrl to load in the webview.
